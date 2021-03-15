@@ -8,6 +8,21 @@ on:
       - '**'
       - '!doc/**'
 jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install goimports
+        run:  go get golang.org/x/tools/cmd/goimports
+        env:
+          GO111MODULE: off
+
+      - name: Run sanity checks
+        run: |
+          export PATH=${PATH}:`go env GOPATH`/bin
+          # TODO(tflannag): Add a `go vet ...` check.
+          make vendor && make lint && git diff --exit-code
+
   build:
     runs-on: ubuntu-latest
     steps:
